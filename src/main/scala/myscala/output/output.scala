@@ -318,6 +318,28 @@ object SeqOfSeqExtensions {
       bw.close()
     }
 
+    /** Convertes the first elements of Seq[Seq[T]] to Seq[String] for printing. If the data has different lengths,
+      * then the default value is placed in the hole.
+      *
+      * @param x Seq[Seq[T]] for which the first elements must be converted to strings
+      * @param default string to place if no value is present
+      * @return sequence of Strings for the first elements of each rows
+      */
+    private def mapToStringWithDefault(x: scala.collection.Seq[scala.collection.Seq[T]], default: String = "nan"): Seq[String] = {
+      for (v <- x) yield {
+        if (v.isEmpty) {default}
+        else {v.head.toString}
+      }
+    }
+
+
+    private def tailWithEmptySeq(x: scala.collection.Seq[scala.collection.Seq[T]]): scala.collection.Seq[scala.collection.Seq[T]] = {
+      for (v <- x) yield {
+        if (v.isEmpty) {scala.collection.immutable.Vector()}
+        else {v.tail}
+      }
+    }
+
     /** Writes the seq of seq as a string in a recursive way. The vectors contained in the
       * Seq are written as columns and the commas separate the values.
       *
@@ -325,16 +347,10 @@ object SeqOfSeqExtensions {
       * @param str string accumulator
       * @return all the vectors as a string.
       */
-    /*private def reduceSeqOfSeqToString(seqOfSeq: scala.collection.Seq[scala.collection.Seq[T]], str: String): String = {
-      if (seqOfSeq.isEmpty) str
-      else {
-        reduceSeqOfSeqToString(seqOfSeq.tail, str + seqOfSeq.head.mkString(",") + "\n")
-      }
-    }*/
     private def reduceSeqOfSeqToString(seqOfSeq: scala.collection.Seq[scala.collection.Seq[T]], str: String): String = {
-      if (seqOfSeq.exists(_.isEmpty)) str
+      if (seqOfSeq.forall(_.isEmpty)) str
       else {
-        reduceSeqOfSeqToString(seqOfSeq.map(_.tail), str + seqOfSeq.map(_.head).mkString(",") + "\n")
+        reduceSeqOfSeqToString(tailWithEmptySeq(seqOfSeq), str + mapToStringWithDefault(seqOfSeq).mkString(",") + "\n")
       }
     }
 
@@ -348,7 +364,7 @@ object SeqOfSeqExtensions {
     private def reduceSeqOfSeqToStringWithRowNames(seqOfSeq: scala.collection.Seq[scala.collection.Seq[T]], rowNames: Seq[String], str: String): String = {
       if (seqOfSeq.forall(_.isEmpty)) str
       else {
-        reduceSeqOfSeqToStringWithRowNames(seqOfSeq.map(_.tail), rowNames.tail, str + rowNames.head + "," + seqOfSeq.map(_.head).mkString(",") + "\n")
+        reduceSeqOfSeqToStringWithRowNames(tailWithEmptySeq(seqOfSeq), rowNames.tail, str + rowNames.head + "," + mapToStringWithDefault(seqOfSeq).mkString(",") + "\n")
       }
     }
   }

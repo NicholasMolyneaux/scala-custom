@@ -1,6 +1,5 @@
+import myscala.math.algo.{MTree, Vector2D, norm}
 
-val a: Int = 4
+val treeTest = new MTree[Vector2D](norm: (Vector2D, Vector2D) => Double)
 
-println(a)
-
-val objMap = Map("id" -> "id", "tags" -> Seq("tag1", "tag2"))
+treeTest.insert("abc", new Vector2D(1.0,1.0))

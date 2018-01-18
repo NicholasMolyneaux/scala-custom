@@ -210,5 +210,21 @@ class outputTests extends FunSuite {
     val expected = Source.fromURL(getClass.getResource("/writeToCSV-SeqSeq-withNames-double-expected.csv")).mkString
     assertEquals(expected, test)
   }
+
+  test("#14 file produced from writeToCSV of Seq[Seq[Double]] with uneven lengths") {
+    // create vector[int] and write to file
+    val ss: Vector[scala.collection.immutable.Queue[Double]] = Vector(
+      scala.collection.immutable.Queue(1.5,2.46,3435.0, 56),
+      scala.collection.immutable.Queue(42.4,5,6),
+      scala.collection.immutable.Queue(7.0,8,9.26,3,4,5),
+      scala.collection.immutable.Queue(10,11.123,12),
+      scala.collection.immutable.Queue(13,14))
+    ss.writeToCSV("writeToCSV-SeqSeq-double-uneven.csv", getClass.getResource("/").getPath)
+
+    // read files into strings and compare them
+    val test = Source.fromURL(getClass.getResource("/writeToCSV-SeqSeq-double-uneven.csv")).mkString
+    val expected = Source.fromURL(getClass.getResource("/writeToCSV-SeqSeq-double-uneven-expected.csv")).mkString
+    assertEquals(expected, test)
+  }
 }
 
