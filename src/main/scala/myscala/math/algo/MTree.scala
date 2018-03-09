@@ -14,11 +14,14 @@ class MTree[D](distanceFuntion: (D, D) => Double) {
 
     def RangeSearch(n: NewNode): Unit = {
       n match {
-        case leaf: LeafTrait => {
-          neighbours.appendAll(leaf.contents.filter(l => dMTree(n.parentData, obj) - dMTree(l, n.parentData) <= r).filter(l => dMTree(l, obj) <= r).map(_.id))
+        case leafRoot: NewEmptyRoot => {
+          neighbours.appendAll(leafRoot.contents.filter(de => dMTree(de, obj) < r).map(_.id))
         }
         case root: NewRoot => {
           root.contents.filter(l => dMTree(l, obj) <= r + l.coveringRadius.get).filter(l => dMTree(l, obj) <= r + l.coveringRadius.get).foreach(de => RangeSearch(de.subTree))
+        }
+        case leaf: LeafTrait => {
+          neighbours.appendAll(leaf.contents.filter(l => dMTree(n.parentData, obj) - dMTree(l, n.parentData) <= r).filter(l => dMTree(l, obj) <= r).map(_.id))
         }
         case node: NewNode => {
           node.contents.filter(l => dMTree(n.parentData, obj) - dMTree(l, n.parentData) <= r + l.coveringRadius.get).filter(l => dMTree(l, obj) <= r + l.coveringRadius.get).foreach(de => RangeSearch(de.subTree))
@@ -37,7 +40,7 @@ class MTree[D](distanceFuntion: (D, D) => Double) {
   val LEAF_SIZE: Int = 4
 
 
-  final class NewDataEntry(val id: String, val position: D, private var _subTree: Option[NewNode], val distanceToParent: Double) {
+  class NewDataEntry(val id: String, val position: D, private var _subTree: Option[NewNode], val distanceToParent: Double) {
 
     def this(id: String, pos: D) = this(id, pos, None, 0.0)
 
@@ -56,8 +59,7 @@ class MTree[D](distanceFuntion: (D, D) => Double) {
       distanceFuntion(this.position, de.position)
     }
 
-    //def copy(parNode: NewNode): NewDataEntry = new NewDataEntry(this.id, this.position, this.subTree, this.distanceToParent)
-    def copy(st: Option[NewNode]): NewDataEntry = new NewDataEntry(this.id, this.position, st, this.distanceToParent)
+    //def copy(st: Option[NewNode]): NewDataEntry = new NewDataEntry(this.id, this.position, st, this.distanceToParent)
 
     def copy: NewDataEntry = new NewDataEntry(this.id, this.position, this._subTree, this.distanceToParent)
 

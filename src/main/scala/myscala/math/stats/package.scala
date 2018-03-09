@@ -38,7 +38,8 @@ package object stats {
     Quantile(q,sortedSeq(math.ceil((data.length - 1) * (q / 100.0)).toInt), data.size)
   }
 
-  /** Computes basic statistics of a collection of numeric type
+  /** Computes basic statistics of a collection of numeric type. The statistics are the following:
+    * mean, variance, median, max, min.
     *
     * @param v collection of numeric type
     * @tparam T numeric type

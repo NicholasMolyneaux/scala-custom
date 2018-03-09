@@ -1,19 +1,19 @@
-import myscala.math.algo.{MTree, Vector2D, norm}
+import myscala.math.algo.{MTree}
 
-import scala.util.Random.nextInt
+import myscala.math.vector._
 
 
 object main {
   def main(args: Array[String]): Unit = {
 
-    val treeTest = new MTree[Vector2D](norm: (Vector2D, Vector2D) => Double)
+    val treeTest = new MTree(norm: (Vector2D, Vector2D) => Double)
 
-    /*for (i <- 0 to 5000) {
+    /*for (i <- 0 to 15) {
       treeTest.insert(i.toString, new Vector2D(nextInt(5000), nextInt(5000)))
     }*/
 
 
-    treeTest.insert("1", new Vector2D(1.0,1.0))
+    treeTest.insert("1", Vector2D(1.0,1.0))
     treeTest.insert("2", new Vector2D(1.1,1.1))
     treeTest.insert("3", new Vector2D(1.2,1.05))
     treeTest.insert("4", new Vector2D(4.0,4.0))
@@ -44,6 +44,7 @@ object main {
     //println(treeTest.root.contents(1).subTree)
 
     //println(treeTest)
-    treeTest.printTree(treeTest.root)
+    treeTest.printTree(treeTest.newRoot)
+    println(treeTest.findInRange("9", new Vector2D(8.2,1.0), 1.5))
   }
 }

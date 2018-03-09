@@ -2,7 +2,7 @@ package myscala.math
 
 package object algo {
 
-  trait PhysicalVector
+  /*trait PhysicalVector
 
   sealed class Vector2D(val X: Double, val Y: Double) extends PhysicalVector {
 
@@ -28,10 +28,8 @@ package object algo {
     def / (i: Double): Vector3D = {new Vector3D(this.X / i, this.Y / i, this.Z / i)}
 
     override def toString: String = "(" + X + "," + Y + ")"
-  }
+  }*/
 
-  def norm(a: Vector2D, b: Vector2D): Double = scala.math.pow((b.X-a.X)*(b.X-a.X) + (b.Y-a.Y)*(b.Y-a.Y), 0.5)
-  def norm(a: Vector3D, b: Vector3D): Double = scala.math.pow((b.X-a.X)*(b.X-a.X) + (b.Y-a.Y)*(b.Y-a.Y) + (b.Z-a.Z)*(b.Z-a.Z), 0.5)
 
 
 
