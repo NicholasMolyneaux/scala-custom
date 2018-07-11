@@ -38,28 +38,38 @@ package object stats {
     Quantile(q,sortedSeq(math.ceil((data.length - 1) * (q / 100.0)).toInt), data.size)
   }
 
+  //type StatsResults[T: Numeric] = (Int, Double, Double, Double, Double, Double)
+
   /** Computes basic statistics of a collection of numeric type. The statistics are the following:
     * mean, variance, median, max, min.
     *
     * @param v collection of numeric type
     * @tparam T numeric type
-    * @return (mean, var, max, min)
+    * @return (size, mean, var, median, min, max)
     */
-  def stats[T: Numeric](v: scala.collection.Seq[T]): (Double, Double, Double, T, T) = {
+  def stats[T: Numeric](v: scala.collection.Iterable[T]): (Int, Double, Double, Double, T, T) = {
 
-    // mean and variance computation
-    val mean: Double = implicitly[Numeric[T]].toDouble(v.sum) * (1.0/v.size)
-    val diff2Mean: Seq[Double] = v.map(implicitly[Numeric[T]].toDouble(_) - mean )
+    if (v.nonEmpty) {
+      // mean and variance computation
+      val mean: Double = implicitly[Numeric[T]].toDouble(v.sum) * (1.0 / v.size)
+      val diff2Mean: Vector[Double] = v.map(implicitly[Numeric[T]].toDouble(_) - mean).toVector
 
-    // median computation
-    val (lower: Seq[T], upper: Seq[T]) = v.sorted.splitAt(v.size / 2)
-    val median: Double = if (v.size % 2 == 0) {
-      (implicitly[Numeric[T]].toDouble(lower.last) + implicitly[Numeric[T]].toDouble(upper.head)) / 2.0
+      // median computation
+      val (lower: Seq[T], upper: Seq[T]) = v.toVector.sorted.splitAt(v.size / 2)
+      val median: Double = if (v.size % 2 == 0) {
+        (implicitly[Numeric[T]].toDouble(lower.last) + implicitly[Numeric[T]].toDouble(upper.head)) / 2.0
+      } else {
+        implicitly[Numeric[T]].toDouble(upper.head)
+      }
+
+      (v.size, mean, math.sqrt(diff2Mean.map(v => v * v).sum / (v.size - 1.0)), median, v.min(implicitly[Numeric[T]]), v.max(implicitly[Numeric[T]]))
     } else {
-      implicitly[Numeric[T]].toDouble(upper.head)
+      (0, Double.NaN, Double.NaN, Double.NaN, Double.NaN.asInstanceOf[T], Double.NaN.asInstanceOf[T])
     }
+  }
 
-    (mean, math.sqrt(diff2Mean.map(v => v*v).sum/(v.size-1.0)), median, v.max(implicitly[Numeric[T]]), v.min(implicitly[Numeric[T]]))
+  implicit class ComputeStats[T: Numeric](x: scala.collection.Iterable[T]) {
+    def stats: (Int, Double, Double, Double, T, T) = myscala.math.stats.stats(x)
   }
 }
 

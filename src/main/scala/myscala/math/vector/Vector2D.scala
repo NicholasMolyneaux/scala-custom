@@ -17,6 +17,33 @@ class Vector2D(val X: Double, val Y: Double) extends PhysicalVector with Physica
   def orthogonal: Vector2D = new Vector2D(-this.Y, this.X).normalized
 
   override def toString: String = "(" + X + ", " + Y + ")"
+
+  /** Checks whether another object equals this one
+    *
+    * @param other another object to test equality for
+    * @return boolean indicating if the two objects are the same
+    */
+  override def equals(other: Any): Boolean =
+    other match {
+      case that: Vector2D => that.canEqual(this) && this.X == that.X && this.Y == that.Y
+      case _ => false
+    }
+
+  /** Checks whether we are allowed to compare this object to another
+    *
+    * @param other Vector to compare to
+    * @return
+    */
+  def canEqual(other: Any): Boolean = other.isInstanceOf[Vector2D]
+
+
+  /** Definition of equality.
+    *
+    * @return Int representing the object
+    */
+  override def hashCode: Int = {
+    (this.X, this.Y).##
+  }
 }
 
 object Vector2D {

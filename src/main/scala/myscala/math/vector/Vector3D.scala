@@ -1,6 +1,5 @@
 package myscala.math.vector
 
-
 class Vector3D(val X: Double, val Y: Double, val Z: Double) extends PhysicalVector with PhysicalVectorOps[Vector3D] {
 
   def + (that: Vector3D): Vector3D = {new Vector3D(this.X + that.X, this.Y + that.Y, this.Z + that.Z)}
@@ -17,6 +16,33 @@ class Vector3D(val X: Double, val Y: Double, val Z: Double) extends PhysicalVect
   def normalized: Vector3D = new Vector3D(this.X / this.norm, this.Y / this.norm, this.Z / this.norm)
 
   override def toString: String = "(" + X + ", " + Y + ", " + Z + ")"
+
+  /** Checks whether another object equals this one
+    *
+    * @param other another object to test equality for
+    * @return boolean indicating if the two objects are the same
+    */
+  override def equals(other: Any): Boolean =
+    other match {
+      case that: Vector3D => that.canEqual(this) && this.X == that.X && this.Y == that.Y && this.Z == that.Z
+      case _ => false
+    }
+
+  /** Checks whether we are allowed to compare this object to another
+    *
+    * @param other Vector to compare to
+    * @return
+    */
+  def canEqual(other: Any): Boolean = other.isInstanceOf[Vector3D]
+
+
+  /** Definition of equality.
+    *
+    * @return Int representing the object
+    */
+  override def hashCode: Int = {
+    (this.X, this.Y, this.Z).##
+  }
 
 }
 
