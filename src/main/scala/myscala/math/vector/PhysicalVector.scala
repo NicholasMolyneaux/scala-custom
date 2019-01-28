@@ -1,3 +1,3 @@
 package myscala.math.vector
 
-trait PhysicalVector {}
+trait PhysicalVector

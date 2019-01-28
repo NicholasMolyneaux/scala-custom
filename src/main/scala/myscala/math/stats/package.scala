@@ -38,7 +38,37 @@ package object stats {
     Quantile(q,sortedSeq(math.ceil((data.length - 1) * (q / 100.0)).toInt), data.size)
   }
 
-  //type StatsResults[T: Numeric] = (Int, Double, Double, Double, Double, Double)
+  /**
+    *
+    * @param x collection of Numeric type
+    * @tparam T must be Numeric
+    */
+  implicit class ComputeQuantiles[T: Numeric](x: scala.collection.Seq[T]) {
+
+    val num: Numeric[T] = implicitly[Numeric[T]]
+    import num.mkOrderingOps
+
+    /**
+      * Returns the distribution without the values strictly above the quantile specified as argument.
+      * @param q quantile above which to cut off
+      * @return original collection without values above quantile q
+      */
+    def cutOfAfterQuantile(q: Double): scala.collection.Seq[T] = {
+      val valueAtQuantile: T = myscala.math.stats.computeQuantile(q)(x).value
+      x.filter(v => v <= valueAtQuantile)
+    }
+
+    /**
+      * Returns the distribution without the values strictly below the quantile specified as argument.
+      * @param q quantile below which to cut off
+      * @return original collection without values below quantile q
+      */
+    def cutOfBeforeQuantile(q: Double): scala.collection.Seq[T] = {
+      val valueAtQuantile: T = myscala.math.stats.computeQuantile(q)(x).value
+      x.filter(v => v >= valueAtQuantile)
+    }
+  }
+
 
   /** Computes basic statistics of a collection of numeric type. The statistics are the following:
     * mean, variance, median, max, min.
@@ -63,6 +93,8 @@ package object stats {
       }
 
       (v.size, mean, math.sqrt(diff2Mean.map(v => v * v).sum / (v.size - 1.0)), median, v.min(implicitly[Numeric[T]]), v.max(implicitly[Numeric[T]]))
+    } else if (v.size == 1) {
+      (v.size, implicitly[Numeric[T]].toDouble(v.head), Double.NaN, implicitly[Numeric[T]].toDouble(v.head), v.head, v.head)
     } else {
       (0, Double.NaN, Double.NaN, Double.NaN, Double.NaN.asInstanceOf[T], Double.NaN.asInstanceOf[T])
     }
@@ -70,6 +102,39 @@ package object stats {
 
   implicit class ComputeStats[T: Numeric](x: scala.collection.Iterable[T]) {
     def stats: (Int, Double, Double, Double, T, T) = myscala.math.stats.stats(x)
+  }
+
+
+
+  /** Computes the data for plotting a box plot. The input is a Seq of Numeric type. The output is a [[BoxPlot]] object
+    * containing the results.
+    *
+    * The whiskers are defined in the pgfplots manual in the section about boxplots (https://ctan.org/pkg/pgfplots?lang=en).
+    *
+    * @param data Seq of numeric type to compute the boxplot data for.
+    * @return [[BoxPlot]] object
+    */
+  def computeBoxPlotData[T: Numeric](data: Seq[T]): BoxPlot[T] = {
+
+    val num: Numeric[T] = implicitly[Numeric[T]]
+    import num.mkNumericOps
+
+    val mean: Double = data.sum.toDouble()/data.size
+
+    val quarters = computeQuantiles(Vector(25.0, 50.0, 75.0))(data)
+    val lowerQuartile = quarters.values(0)
+    val median = quarters.values(1)
+    val upperQuartile = quarters.values(2)
+
+    val lowerQuartileDouble = lowerQuartile.toDouble
+    val medianDouble = median.toDouble
+    val upperQuartileDouble  = upperQuartile.toDouble
+
+    val lowerWhisker: Double = data.map(_.toDouble() - (lowerQuartileDouble - (upperQuartileDouble - lowerQuartileDouble) * 1.5)).filter(_ >= 0).min + lowerQuartileDouble - (upperQuartileDouble - lowerQuartileDouble) * 1.5
+    val upperWhisker: Double = data.map(_.toDouble() - (upperQuartileDouble + (upperQuartileDouble - lowerQuartileDouble) * 1.5)).filter(_ <= 0).max + upperQuartileDouble + (upperQuartileDouble - lowerQuartileDouble) * 1.5
+
+    BoxPlot(mean, medianDouble, lowerQuartile, upperQuartile, lowerWhisker, upperWhisker, data.filter(v => v.toDouble() < lowerWhisker || v.toDouble() > upperWhisker)
+    )
   }
 }
 

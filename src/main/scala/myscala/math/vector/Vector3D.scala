@@ -1,5 +1,13 @@
 package myscala.math.vector
 
+/**
+  * Simple 3 dimensional vector class. Objective is to keep this class concise and fast. Standard operations are defined
+  * such as vectorial summation and subtraction , scala multiplication/division/summation7subtraction and operations like
+  * normalization, dot product, etc.
+  * @param X
+  * @param Y
+  * @param Z
+  */
 class Vector3D(val X: Double, val Y: Double, val Z: Double) extends PhysicalVector with PhysicalVectorOps[Vector3D] {
 
   def + (that: Vector3D): Vector3D = {new Vector3D(this.X + that.X, this.Y + that.Y, this.Z + that.Z)}
@@ -46,6 +54,10 @@ class Vector3D(val X: Double, val Y: Double, val Z: Double) extends PhysicalVect
 
 }
 
+/**
+  * Companion object of the [[Vector3D]] class. The apply method is defined such that the "new" keyword
+  * can be omitted.
+  */
 object Vector3D {
   def apply(x: Double, y: Double, z: Double): Vector3D = new Vector3D(x, y, z)
 }
