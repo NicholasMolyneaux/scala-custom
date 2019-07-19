@@ -1,6 +1,6 @@
 package myscala.math.algo
 
-class MTree[D](distanceFuntion: (D, D) => Double) {
+class MTree[D](distanceFuntion: (D, D) => Double, leafSize: Int = 10) {
 
   var newRoot: NewRoot = new NewEmptyRoot
 
@@ -37,7 +37,7 @@ class MTree[D](distanceFuntion: (D, D) => Double) {
   }
 
 
-  val LEAF_SIZE: Int = 4
+  val LEAF_SIZE: Int = leafSize
 
 
   class NewDataEntry(val id: String, val position: D, private var _subTree: Option[NewNode], val distanceToParent: Double) {

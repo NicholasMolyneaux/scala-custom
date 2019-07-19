@@ -67,7 +67,7 @@ class outputTests extends FunSuite {
 
   test("#5 file produced from writeToCSV of Map[U, Vector[Double]] of different size vectors") {
     // create vector[int] and write to file
-    val v:Map[String, scala.collection.mutable.ArrayBuffer[Double]] = Map(
+    val v: Map[String, scala.collection.mutable.ArrayBuffer[Double]] = Map(
       "a" -> scala.collection.mutable.ArrayBuffer(1.5,2,3),
       "b" -> scala.collection.mutable.ArrayBuffer(6,7,8.99,9,10),
       "c" -> scala.collection.mutable.ArrayBuffer(4,15)
@@ -117,20 +117,20 @@ class outputTests extends FunSuite {
 
   test("#8 file produced from writeToJSON of Map[U, Vector[Double]] of different size vectors to tolerance of 10^-5") {
     // create vector[int] and write to file
-    val v:Map[String, Vector[Double]] = Map("a" -> Vector(1.5,2,3), "b" -> Vector(6,7,8.99,9,10), "c" -> Vector(4,15))
-    v.writeToJSON("scalatest", "writeToJSON-map-different-size-vectors.csv", getClass.getResource("/").getPath)
+    val v: scala.collection.immutable.Map[String, Vector[Double]] = Map("a" -> Vector(1.5,2,3), "b" -> Vector(6,7,8.99,9,10), "c" -> Vector(4,15))
+    v.writeToJSON("scalatest", "writeToJSON-map-different-size-vectors.json", getClass.getResource("/").getPath)
 
-    val inputExpected = readMultipleVectors(getClass.getResource("/writeToJSON-map-different-size-vectors-expected.csv").getFile)
-    val expected: (String, Map[String, List[Double]]) = (inputExpected.get.str, inputExpected.get.v.map(c => c.str -> c.v.map(_.toDouble)).toMap)
+    val inputExpected = readMultipleVectors(getClass.getResource("/writeToJSON-map-different-size-vectors-expected.json").getFile)
+    val expected: (String, scala.collection.immutable.Map[String, Vector[Double]]) = (inputExpected.get.str, inputExpected.get.v.map(c => c.str -> c.v.map(_.toDouble)).toMap)
 
-    val inputTest = readMultipleVectors(getClass.getResource("/writeToJSON-map-different-size-vectors.csv").getFile)
-    val test: (String, Map[String, List[Double]]) = (inputTest.get.str, inputTest.get.v.map(c => c.str -> c.v.map(_.toDouble)).toMap)
+    val inputTest = readMultipleVectors(getClass.getResource("/writeToJSON-map-different-size-vectors.json").getFile)
+    val test: (String, scala.collection.immutable.Map[String, Vector[Double]]) = (inputTest.get.str, inputTest.get.v.map(c => c.str -> c.v.map(_.toDouble)).toMap)
 
     assertEquals(expected._1, test._1)
     assertEquals(expected._2.size, test._2.size)
 
-    val expectedKeys: Seq[String] = expected._2.keys.toSeq
-    val testKeys: Seq[String] = test._2.keys.toSeq
+    val expectedKeys: scala.collection.immutable.Seq[String] = expected._2.keys.toVector
+    val testKeys: scala.collection.immutable.Seq[String] = test._2.keys.toVector
 
     assert((for (i <- expectedKeys.indices) yield {
       testKeys.contains(expectedKeys(i)) && expectedKeys.contains(testKeys(i))
@@ -144,7 +144,7 @@ class outputTests extends FunSuite {
   test("#9 file produced from writeToCSV of ArrayBuffer[(Int, Int)]") {
     // create vector[int] and write to file
     val ab:scala.collection.mutable.ArrayBuffer[(Int, Int)] = scala.collection.mutable.ArrayBuffer((1,10),(2,20),(3,30),(4,40),(5,50),(6,60),(7,70),(8,80),(9,90),(10,100))
-    ab.writeToCSV("writeToCSV-ArrayBuffer-tuple-int-int.csv", getClass.getResource("/").getPath)
+    myscala.output.SeqTuplesExtensions.SeqTuplesWriter(ab).writeToCSV("writeToCSV-ArrayBuffer-tuple-int-int.csv", getClass.getResource("/").getPath)
 
     // read files into strings and compare them
     val test = Source.fromURL(getClass.getResource("/writeToCSV-ArrayBuffer-tuple-int-int.csv")).mkString
@@ -155,7 +155,7 @@ class outputTests extends FunSuite {
   test("#10 file produced from writeToCSV of ArrayBuffer[(Int, Double)]") {
     // create vector[int] and write to file
     val ab:scala.collection.mutable.ArrayBuffer[(Int, Double)] = scala.collection.mutable.ArrayBuffer((1,1.123),(2,2.0),(3,3.99),(4,4.250),(5,50))
-    ab.writeToCSV("writeToCSV-ArrayBuffer-tuple-int-double.csv", getClass.getResource("/").getPath)
+    myscala.output.SeqTuplesExtensions.SeqTuplesWriter(ab).writeToCSV("writeToCSV-ArrayBuffer-tuple-int-double.csv", getClass.getResource("/").getPath)
 
     // read files into strings and compare them
     val test = Source.fromURL(getClass.getResource("/writeToCSV-ArrayBuffer-tuple-int-double.csv")).mkString
@@ -171,7 +171,7 @@ class outputTests extends FunSuite {
       scala.collection.mutable.ArrayBuffer(7,8,9),
       scala.collection.mutable.ArrayBuffer(10,11,12),
       scala.collection.mutable.ArrayBuffer(13,14,15))
-    ss.writeToCSV("writeToCSV-SeqSeq-int.csv", getClass.getResource("/").getPath)
+    myscala.output.SeqOfSeqExtensions.SeqOfSeqWriter(ss.map(_.toSeq)).writeToCSV("writeToCSV-SeqSeq-int.csv", getClass.getResource("/").getPath)
 
     // read files into strings and compare them
     val test = Source.fromURL(getClass.getResource("/writeToCSV-SeqSeq-int.csv")).mkString
@@ -186,7 +186,7 @@ class outputTests extends FunSuite {
       scala.collection.immutable.Queue(42.4,5,6),
       scala.collection.immutable.Queue(7.0,8,9.26),
       scala.collection.immutable.Queue(10,11.123,12),
-      scala.collection.immutable.Queue(13,14,15))
+      scala.collection.immutable.Queue(13,14.0,15))
     ss.writeToCSV("writeToCSV-SeqSeq-double.csv", getClass.getResource("/").getPath)
 
     // read files into strings and compare them
@@ -202,7 +202,7 @@ class outputTests extends FunSuite {
       scala.collection.immutable.Queue(42.4,5,6),
       scala.collection.immutable.Queue(7.0,8,9.26),
       scala.collection.immutable.Queue(10,11.123,12),
-      scala.collection.immutable.Queue(13,14,15))
+      scala.collection.immutable.Queue(13,14.0,15))
     ss.writeToCSV("writeToCSV-SeqSeq-withNames-double.csv", Option(Vector("a", "b", "c")), Option(Vector("id", "1", "2", "3","4", "5")), getClass.getResource("/").getPath)
 
     // read files into strings and compare them
@@ -218,7 +218,7 @@ class outputTests extends FunSuite {
       scala.collection.immutable.Queue(42.4,5,6),
       scala.collection.immutable.Queue(7.0,8,9.26,3,4,5),
       scala.collection.immutable.Queue(10,11.123,12),
-      scala.collection.immutable.Queue(13,14))
+      scala.collection.immutable.Queue(13,14.0))
     ss.writeToCSV("writeToCSV-SeqSeq-double-uneven.csv", getClass.getResource("/").getPath)
 
     // read files into strings and compare them

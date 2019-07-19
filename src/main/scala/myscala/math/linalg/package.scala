@@ -1,20 +1,10 @@
 package myscala.math
 
-import breeze.linalg.DenseVector
+import myscala.math.vector.Vector2D
 
 /**
   * Linear algebra functions
   *  - compute area based on 2D vectors
-  *
-  *  ==Overview==
-  *  The main functions in this package are used as follows
-  *  {{{
-  *  import breeze.linalg.DenseVector
-  *  val ab: DenseVector[Double] = DenseVector(2.0,0.0)
-  *  val ad: DenseVector[Double] = DenseVector(0.0,3.0)
-  *  areaFrom2DVectors(ab,ac)
-  *  }}}
-  *
   */
 package object linalg {
 
@@ -25,9 +15,7 @@ package object linalg {
     * @param b second vector
     * @return area spanned by both input vectors
     */
-  def areaFrom2DVectors[T: Numeric](a: DenseVector[T], b: DenseVector[T]): T = {
-    require(a.length == 2)
-    require(b.length == 2)
-    implicitly[Numeric[T]].abs(implicitly[Numeric[T]].minus(implicitly[Numeric[T]].times(a(0),b(1)), implicitly[Numeric[T]].times(a(1),b(0))))
+  def areaFrom2DVectors(a: Vector2D, b: Vector2D): Double = {
+    math.abs(a.X * b.Y - a.Y * b.X)
   }
 }

@@ -13,13 +13,15 @@ package myscala.math.stats
   * @param outliers collection of outliers
   * @tparam T type of data
   */
-case class BoxPlot[T](mean: Double, median: Double, lowerQuartile: T, upperQuartile: T, lowerWhisker: Double, upperWhisker: Double, outliers: Seq[T]) {
+case class BoxPlot[T: Numeric](mean: Double, median: Double, lowerQuartile: T, upperQuartile: T, lowerWhisker: Double, upperWhisker: Double, outliers: Seq[T]) {
 
   override def toString: String = "Box plot results. Mean: " + this.mean + ", median: " + this.median + ", LQ: " + this.lowerQuartile +
     ", UQ: " + this.upperQuartile + ", LW: " + this.lowerWhisker + ", UW: " + this.upperWhisker + ", outlier count: " + this.outliers.size
 
+  val CSVColumnNames: String = "mean,median,lq,uq,lw,uw,outliersize"
+
   def toCSV: String =
-    this.mean + ",: " + this.median + ", " + this.lowerQuartile + "," + this.upperQuartile + "," + this.lowerWhisker + "," + this.upperWhisker + "," + this.outliers.size
+    this.mean + ", " + this.median + ", " + this.lowerQuartile + "," + this.upperQuartile + "," + this.lowerWhisker + "," + this.upperWhisker + "," + this.outliers.size
 
   def toTuple: (Double, Double, T, T, Double, Double, Int) =
     (this.mean , this.median , this.lowerQuartile , this.upperQuartile , this.lowerWhisker , this.upperWhisker , this.outliers.size)

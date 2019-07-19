@@ -50,7 +50,7 @@ object SeqTuplesExtensions {
       *
       * @param fileName the name of the file
       */
-    def writeToCSV(fileName: String, rowNames: Option[Seq[String]], columnNames: Option[Seq[String]]): Unit = {
+    def writeToCSV(fileName: String, rowNames: Option[scala.collection.immutable.Seq[String]], columnNames: Option[scala.collection.immutable.Seq[String]]): Unit = {
       SeqOfSeqExtensions.SeqOfSeqWriter(x.map(t => t.productIterator.toVector).transpose).writeToCSV(fileName, rowNames, columnNames)
     }
 
@@ -61,7 +61,7 @@ object SeqTuplesExtensions {
       * @param fileName the name of the file
       * @param path path with trailing /, default is empty ""
       */
-    def writeToCSV(fileName: String, rowNames: Option[Seq[String]], columnNames: Option[Seq[String]], path: String): Unit = {
+    def writeToCSV(fileName: String, rowNames: Option[scala.collection.immutable.Seq[String]], columnNames: Option[scala.collection.immutable.Seq[String]], path: String): Unit = {
       SeqOfSeqExtensions.SeqOfSeqWriter(x.map(t => t.productIterator.toVector).transpose).writeToCSV(fileName, rowNames, columnNames, path)
     }
   }

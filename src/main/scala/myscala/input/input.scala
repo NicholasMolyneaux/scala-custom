@@ -15,7 +15,9 @@ object ReadJson {
     * @param str fieldname
     * @param v list of strings representing the data
     */
-  case class Container(str: String, v: List[String])
+  case class Container(str: String, v: Vector[String])
+
+
 
   /**
     * implicit reader for the play framework to convert the strings to JSON format. Reads a JSON file looking like
@@ -24,10 +26,10 @@ object ReadJson {
     * }
     * and fills the [[Container]] class with the data.
     */
-  implicit val ContainerReads: Reads[Seq[Container]] =
-    new Reads[Seq[Container]] {
-      override def reads(json: JsValue): JsResult[Seq[Container]] = json match {
-        case j: JsObject => JsSuccess(j.fields.map(i => Container(i._1, i._2.validate[List[String]].get)))
+  implicit val ContainerReads: Reads[Vector[Container]] =
+    new Reads[Vector[Container]] {
+      override def reads(json: JsValue): JsResult[Vector[Container]] = json match {
+        case j: JsObject => JsSuccess(j.fields.map(i => Container(i._1, i._2.validate[Vector[String]].get.toVector)).toVector)
         case _ => JsError("Invalid JSON type")
       }
     }
@@ -37,10 +39,10 @@ object ReadJson {
     * @param str file to read
     * @return [[Container]] storing the data
     */
-  def readVector(str: String): Option[Seq[Container]] = {
+  def readVector(str: String): Option[Vector[Container]] = {
     val sourceTest: BufferedSource = scala.io.Source.fromFile(str)
     val inputTest: JsValue = Json.parse(try sourceTest.mkString finally sourceTest.close)
-    inputTest.asOpt[Seq[Container]]
+    inputTest.asOpt[Vector[Container]]
   }
 
 
@@ -50,7 +52,7 @@ object ReadJson {
     * @param str fieldname from JSON
     * @param v sequence of containers stoing the data using the [[Container]] case class.
     */
-  case class ContainerMultipleVector(str: String, v: Seq[Container])
+  case class ContainerMultipleVector(str: String, v: Vector[Container])
 
   /**
     * implicit reader for the play framework to convert the strings to JSON format. Reads a JSON file looking like
@@ -67,9 +69,9 @@ object ReadJson {
     new Reads[ContainerMultipleVector] {
       override def reads(json: JsValue): JsResult[ContainerMultipleVector] = json match {
         case j: JsObject =>
-          JsSuccess(ContainerMultipleVector(j.fields.head._1, j.fields.head._2.validate[Seq[Container]] match {
-            case k: JsSuccess[Seq[Container]] => k.get
-            case _ => throw new Exception("Invalid JSON type")
+          JsSuccess(ContainerMultipleVector(j.fields.head._1, j.fields.head._2.validate[Vector[Container]] match {
+            case k: JsSuccess[Vector[Container]] => k.get
+            case _ => throw new Exception("Invalid JSON type a")
           }))
         case _ => JsError("Invalid JSON type")
       }

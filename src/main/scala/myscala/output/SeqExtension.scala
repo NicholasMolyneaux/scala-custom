@@ -52,7 +52,7 @@ object SeqExtension {
     def writeToJSON(fieldName: String, fileName: String, path: String = ""): Unit = {
       val file = new File(path + fileName)
       val bw = new BufferedWriter(new FileWriter(file))
-      val m: Map[String, Seq[String]] = Map(fieldName -> x.map(_.toString))
+      val m: Map[String, scala.collection.Seq[String]] = Map(fieldName -> x.map(_.toString).toSeq)
       bw.write(Json.prettyPrint(Json.toJson(m)))
       bw.close()
     }

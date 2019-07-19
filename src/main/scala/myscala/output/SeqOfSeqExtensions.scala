@@ -27,7 +27,7 @@ object SeqOfSeqExtensions {
     def writeToCSV(fileName: String): Unit = {
       val file = new File(fileName)
       val bw = new BufferedWriter(new FileWriter(file))
-      bw.write(reduceSeqOfSeqToString(x, "").stripLineEnd)
+      bw.write(reduceSeqOfSeqToString(x.map(_.toVector).toVector, "").stripLineEnd)
       bw.close()
     }
 
@@ -41,7 +41,7 @@ object SeqOfSeqExtensions {
     def writeToCSV(fileName: String, path: String = ""): Unit = {
       val file = new File(path + fileName)
       val bw = new BufferedWriter(new FileWriter(file))
-      bw.write(reduceSeqOfSeqToString(x, "").stripLineEnd)
+      bw.write(reduceSeqOfSeqToString(x.map(_.toVector).toVector, "").stripLineEnd)
       bw.close()
     }
 
@@ -52,7 +52,7 @@ object SeqOfSeqExtensions {
       * @param str string accumulator
       * @return all the vectors as a string.
       */
-    private def reduceSeqOfSeqToString(seqOfSeq: scala.collection.Seq[scala.collection.Seq[T]], str: String): String = {
+    private def reduceSeqOfSeqToString(seqOfSeq: scala.collection.immutable.Seq[scala.collection.immutable.Seq[T]], str: String): String = {
       if (seqOfSeq.forall(_.isEmpty)) str
       else {
         reduceSeqOfSeqToString(tailWithEmptySeq(seqOfSeq), str + mapToStringWithDefault(seqOfSeq).mkString(",") + "\n")
@@ -72,7 +72,7 @@ object SeqOfSeqExtensions {
       * @param rowNames row names
       * @param columnNames column names
       */
-    def writeToCSV(fileName: String, rowNames: Option[Seq[String]], columnNames: Option[Seq[String]]): Unit = writeToCSVWithNames(fileName, rowNames, columnNames)
+    def writeToCSV(fileName: String, rowNames: Option[scala.collection.immutable.Seq[String]], columnNames: Option[scala.collection.immutable.Seq[String]]): Unit = writeToCSVWithNames(fileName, rowNames, columnNames)
 
     /** Writes the data including column and/or row names to CSV file. The column and row names are passed as [[Option]]
       * meaning they can be left as [[None]]. Both vectors (or other ordered collection) should not be set as None. The
@@ -90,7 +90,7 @@ object SeqOfSeqExtensions {
       * @param columnNames column names
       * @param path location of the file
       */
-    def writeToCSV(fileName: String, rowNames: Option[Seq[String]], columnNames: Option[Seq[String]], path: String): Unit = writeToCSVWithNames(fileName, rowNames, columnNames, path)
+    def writeToCSV(fileName: String, rowNames: Option[scala.collection.immutable.Seq[String]], columnNames: Option[scala.collection.immutable.Seq[String]], path: String): Unit = writeToCSVWithNames(fileName, rowNames, columnNames, path)
 
 
     /** Process the row and column name vectors then writes the data to a file. Thos function is called by the wrappers
@@ -101,7 +101,7 @@ object SeqOfSeqExtensions {
       * @param columnNames column names
       * @param path location of the file
       */
-    private def writeToCSVWithNames(fileName: String, rowNames: Option[Seq[String]], columnNames: Option[Seq[String]], path: String = ""): Unit = {
+    private def writeToCSVWithNames(fileName: String, rowNames: Option[scala.collection.immutable.Seq[String]], columnNames: Option[scala.collection.immutable.Seq[String]], path: String = ""): Unit = {
 
 
       val file = new File(path + fileName)
@@ -115,18 +115,18 @@ object SeqOfSeqExtensions {
           rowNames match {
             case Some(r) if Try(r.lengthCompare(x.head.size)).isSuccess && Try(c.lengthCompare(x.length+1)).isSuccess => { // row names and column names are used
               // Writes the data and row names to the file.
-              bw.write(reduceSeqOfSeqToStringWithRowNames(x, r, "").stripLineEnd)
+              bw.write(reduceSeqOfSeqToStringWithRowNames(x.map(_.toVector).toVector, r, "").stripLineEnd)
             }
             case None => { // column names are used but no row names
               // Writes the data without row names to the file.
-              bw.write(reduceSeqOfSeqToString(x, "").stripLineEnd)
+              bw.write(reduceSeqOfSeqToString(x.map(_.toVector).toVector, "").stripLineEnd)
             }
           }
         }
         case None => { // no columm names
           rowNames match {
             case Some(r) if Try(r.lengthCompare(x.head.size)).isSuccess => { // no column names but row names are used
-              bw.write(reduceSeqOfSeqToStringWithRowNames(x, r, "").stripLineEnd)
+              bw.write(reduceSeqOfSeqToStringWithRowNames(x.map(_.toVector).toVector, r, "").stripLineEnd)
             }
             case None => { // no row names and not column names, this case *should* never be used.
               println(" You shouldn't be using the CSV writer for row and/or column names without any column names !!\n Calling the correct method instead !!")
@@ -145,17 +145,17 @@ object SeqOfSeqExtensions {
       * @param default string to place if no value is present
       * @return sequence of Strings for the first elements of each rows
       */
-    private def mapToStringWithDefault(x: scala.collection.Seq[scala.collection.Seq[T]], default: String = "nan"): Seq[String] = {
-      for (v <- x) yield {
+    private def mapToStringWithDefault(x: scala.collection.immutable.Seq[scala.collection.immutable.Seq[T]], default: String = "nan"): scala.collection.immutable.Seq[String] = {
+      (for (v <- x) yield {
         if (v.isEmpty) {default}
         else {v.head.toString}
-      }
+      }).toVector
     }
 
 
-    private def tailWithEmptySeq(x: scala.collection.Seq[scala.collection.Seq[T]]): scala.collection.Seq[scala.collection.Seq[T]] = {
+    private def tailWithEmptySeq(x: scala.collection.immutable.Seq[scala.collection.immutable.Seq[T]]): scala.collection.immutable.Seq[scala.collection.immutable.Seq[T]] = {
       for (v <- x) yield {
-        if (v.isEmpty) {scala.collection.immutable.Vector()}
+        if (v.isEmpty) {scala.collection.immutable.Seq()}
         else {v.tail}
       }
     }
@@ -168,7 +168,7 @@ object SeqOfSeqExtensions {
       * @param str accumulator
       * @return String formed from the data
       */
-    private def reduceSeqOfSeqToStringWithRowNames(seqOfSeq: scala.collection.Seq[scala.collection.Seq[T]], rowNames: Seq[String], str: String): String = {
+    private def reduceSeqOfSeqToStringWithRowNames(seqOfSeq: scala.collection.immutable.Seq[scala.collection.immutable.Seq[T]], rowNames: Seq[String], str: String): String = {
       if (seqOfSeq.forall(_.isEmpty)) str
       else {
         reduceSeqOfSeqToStringWithRowNames(tailWithEmptySeq(seqOfSeq), rowNames.tail, str + rowNames.head + "," + mapToStringWithDefault(seqOfSeq).mkString(",") + "\n")

@@ -25,16 +25,16 @@ object MapSeqExtensions {
       * @param str string accumulator
       * @return all the vectors as a string.
       */
-    private def reduceMapOfVectorsToString(mapVec: scala.collection.Map[U, scala.collection.Seq[T]], str: String): String = {
+    private def reduceMapOfVectorsToString(mapVec: Map[U, scala.collection.Seq[T]], str: String): String = {
       if (mapVec.forall(p => p._2.isEmpty)) str
-      else if (mapVec.forall(p => p._2.nonEmpty)) reduceMapOfVectorsToString(mapVec.map(p => (p._1, p._2.tail)), str + mapVec.map(p => p._2.head).mkString(",") + "\n")
+      else if (mapVec.forall(p => p._2.nonEmpty)) reduceMapOfVectorsToString(mapVec.map(p => (p._1, p._2.tail)), str + mapVec.map(kv => kv._2.head).mkString(",") + "\n")
       else if (mapVec.exists(p => p._2.nonEmpty)) {
         val strToAdd: String = mapVec.map(v => {
           if (v._2.nonEmpty) v._2.head.toString
           else "NaN"
         }).mkString(",")
         reduceMapOfVectorsToString(mapVec.map(p => p._1 -> {
-          if (p._2.isEmpty) Seq[T]()
+          if (p._2.isEmpty) scala.collection.immutable.Seq[T]()
           else p._2.tail
         }), str + strToAdd + "\n")
       }
@@ -50,7 +50,7 @@ object MapSeqExtensions {
 
       val file = new File(path + fileName)
       val bw = new BufferedWriter(new FileWriter(file))
-      bw.write(x.keys.mkString(",") ++ "\n" ++ reduceMapOfVectorsToString(x, "").stripLineEnd)
+      bw.write(x.keys.mkString(",") ++ "\n" ++ reduceMapOfVectorsToString(x.toMap, "").stripLineEnd)
       bw.close()
     }
 
@@ -60,10 +60,11 @@ object MapSeqExtensions {
       * @param fileName name of the file
       * @param path path with trailing /, default is empty ""
       */
+    @deprecated("Unreliable JSON format", "1.3.3")
     def writeToJSON(fieldName: String, fileName: String, path: String = ""): Unit = {
       val file = new File(path + fileName)
       val bw = new BufferedWriter(new FileWriter(file))
-      bw.write(Json.prettyPrint(Json.obj(fieldName -> x.map(v => v._1.toString -> v._2.map(_.toString)))))
+      bw.write(Json.prettyPrint(Json.obj(fieldName -> x.toMap.map(v => Json.obj(v._1.toString -> v._2.map(_.toString))).toSeq)))
       bw.close()
     }
   }
